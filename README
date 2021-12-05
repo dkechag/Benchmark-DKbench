@@ -1,0 +1,7 @@
+## DKBench - Perl Benchmark
+
+Perl benchmark that includes some workloads important to my real-world usage.
+
+setup.pl - Setup script (downloads/unzips files, installs 'recommended' module versions from cpan). If your user cannot install modules, adjust with sudo etc.
+
+dkbench.pl - Benchmark run. To compare objectively between systems, it checks for module and perl version and warns if the 'recommended' are not found.
