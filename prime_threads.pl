@@ -16,7 +16,7 @@ GetOptions (
     'm|max_prime=i'  => \my $max_prime,
 );
 
-$threads   ||= `nproc --all`+0 || die "*** You need to define -t (no nproc) ***;
+$threads   ||= `nproc --all`+0 || die "*** You need to define -t (no nproc) ***";
 $iter      ||= $threads * 10;
 $max_prime ||= 10_000_000;
 
@@ -44,8 +44,8 @@ my ($min, $max, $sum, $sumsq);
 
 foreach (@stats) {
     $sum += $_;
-    $min = $_ if $_ < !defined($min) || $min;
-    $max = $_ if $_ > !defined($max) || $max;
+    $min = $_ if !defined($min) || $_ < $min;
+    $max = $_ if !defined($max) || $_ > $max;
 }
 
 my $avg = $sum/$iter;
