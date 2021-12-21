@@ -2,8 +2,8 @@ package DKBench::MooseTree;
 
 use Moose;
 
-has 'price' => (is => 'rw', default => 10);
-has 'tax'   => (is => 'rw', default => 10, lazy => 1);
+has 'price' => (is => 'rw', default    => 10);
+has 'tax'   => (is => 'rw', lazy_build => 1);
 
 has 'node' => (is => 'rw', isa => 'Any');
  
@@ -34,7 +34,12 @@ before 'right', 'left' => sub {
     my ($self, $tree) = @_;
     $tree->parent($self) if defined $tree;
 };
- 
+
+sub _build_tax {
+    my $self = shift;
+    $self->price * 0.2;
+}
+
 sub _build_child_tree {
     my $self = shift;
  
