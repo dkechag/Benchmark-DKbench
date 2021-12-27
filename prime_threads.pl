@@ -17,9 +17,10 @@ GetOptions (
 );
 
 $threads   ||= `nproc --all`+0 || die "*** You need to define -t (no nproc) ***";
-$iter      ||= $threads * 10;
+$iter      ||= $threads * ($threads > 1 ? 10 : 20);
 $max_prime ||= 10_000_000;
 
+print "Perl version $^V\n";
 print "Finding primes to $max_prime on $threads threads, $iter iterations:\n";
 
 MCE::Loop::init {
@@ -40,16 +41,14 @@ my @stats = mce_loop {
     }
 } (1..$iter);
 
-my ($min, $max, $sum, $sumsq);
+my ($sum, $sumsq, $five, $nfive) = (0, 0, ($iter-1)*0.05, ($iter-1)*0.95);
 
-foreach (@stats) {
-    $sum += $_;
-    $min = $_ if !defined($min) || $_ < $min;
-    $max = $_ if !defined($max) || $_ > $max;
-}
+@stats = sort @stats;
+$sum += $_ foreach @stats;
 
 my $avg = $sum/$iter;
 
 $sumsq += ($avg-$_) ** 2 foreach @stats;
 
-printf "Min: %.3f Max: %.3f Avg: %.3f STD: %.3f\n", $min, $max, $avg, ($sumsq/$iter) ** 0.5;
+printf "Min: %.3f Max: %.3f 5%%: %.3f 95%%: %.3f Avg: %.3f STD: %.3f\n",
+    $stats[0], $stats[-1], $stats[int($five+0.5)], $stats[int($nfive+0.5)], $avg, ($sumsq / $iter)**0.5;

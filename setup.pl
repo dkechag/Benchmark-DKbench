@@ -4,10 +4,11 @@ use strict;
 use warnings;
 
 # Assumes you have at least tar/gunzip, File::Fetch and cpanm installed
-# (e.g. yum install perl-App-cpanminus for CentOS 7).
-# Any true argument uses sudo for cpanm commands.
+# (e.g. yum install perl-App-cpanminus for CentOS 7, apt install cpanminus
+# for Debian buster). Any true argument uses sudo for cpanm commands.
 # In some systems you might need to install some modules (XML etc) with the
-# package manager (e.g. yum install perl-XML-LibXML perl-XML-Parser for CentOS)
+# package manager (e.g. yum install perl-XML-LibXML perl-XML-Parser for CentOS,
+# apt install libxml-simple-perl for Debian buster)
 
 use File::Fetch;
 
