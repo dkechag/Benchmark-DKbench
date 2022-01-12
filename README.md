@@ -24,11 +24,11 @@ In some systems you might need to install some modules (XML etc) with the packag
  * **Digest:** Creates MD5, SH1 and SHA-512 digests of a large string. 500x
  * **HTML::FormatText:** Converts HTML to text for 2 sample wiki pages 5 times x 2 layouts each.
  * **Math::DCT:** Does 1 million 8x8 DCT transforms and 50k 32x32 transforms. 
- * **Moose:** Creates 150k small Moose objects. Not the most useful benchmark  (Moose is too slow, surely you are using Moo/Mouse etc instead?), but it is still quite commonly used.
- * **Primes:** Calculates all primes up to 10 million, 5 times. Small number with repeat was chosen to keep low memory (this is a Perl function).
+ * **Moose:** Creates 150k small Moose objects. Not the most useful benchmark, Moose is too slow (surely you are using Moo/Mouse etc instead?), but it is still quite commonly used.
+ * **Primes:** Calculates all primes up to 10 million, x5 times. Small number with repeat was chosen to keep low memory (this is a pure Perl function).
  * **Regex/Replace:** Concatenates 3 wiki pages into a byte string then counts matches of 3 typical regexes (for names, emails, URIs) and replaces html tags with their contents (starting with the innermost). 25 repeats.
- * **Regex/Replace utf8:** Exactly the same as above, but reads into a utf8 string. Perl version can make a big difference, as unicode behaviour has changed.
- * **Test Moose:** Runs 110 tests from the Moose 2.2201 test suite. The least CPU-intensive test, most of the time will loading the interpreter and the Moose module each time, which is representative of default perl unit test suite runs.
+ * **Regex/Replace utf8:** Exactly the same as above, but reads into a utf8 string. Perl version can make a big difference, as unicode behaviour has changed (old Perl versions are faster but less strict in general).
+ * **Test Moose:** Runs 110 tests from the Moose 2.2201 test suite. The least CPU-intensive test, most of the time will be spent loading the interpreter and the Moose module for each test, which is behaviour representative of how a perl test suite runs by default.
 
 ### License
 
