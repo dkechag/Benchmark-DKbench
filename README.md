@@ -30,6 +30,10 @@ In some systems you might need to install some modules (XML etc) with the packag
  * **Regex/Replace utf8:** Exactly the same as above, but reads into a utf8 string. Perl version can make a big difference, as unicode behaviour has changed (old Perl versions are faster but less strict in general).
  * **Test Moose:** Runs 110 tests from the Moose 2.2201 test suite. The least CPU-intensive test, most of the time will be spent loading the interpreter and the Moose module for each test, which is behaviour representative of how a perl test suite runs by default.
 
+### Notes
+
+The benchmark suite was created to compare the performance of various cloud offerings. See the [relevant perl blog post](http://blogs.perl.org/users/dimitrios_kechagias/2022/03/cloud-provider-performance-comparison-gcp-aws-azure-perl.html).
+
 ### License
 
  This software is copyright (c) 2021 by Dimitrios Kechagias.
