@@ -24,13 +24,20 @@ print "Unzipping data files...\n";
 system "gunzip data/*.gz";
 system "cd data && tar xvf t.tar && rm t.tar";
 
+my @packages = qw#
+http://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTML-Parser-3.76.tar.gz
+http://cpan.metacpan.org/authors/id/K/KE/KENTNL/HTML-Tree-5.07.tar.gz
+http://cpan.metacpan.org/authors/id/N/NI/NIGELM/HTML-Formatter-2.16.tar.gz
+http://cpan.metacpan.org/authors/id/K/KA/KAMELKEV/CSS-Inliner-4014.tar.gz
+http://cpan.metacpan.org/authors/id/C/CJ/CJFIELDS/BioPerl-1.7.8.tar.gz
+http://cpan.metacpan.org/authors/id/E/ET/ETHER/Moose-2.2201.tar.gz
+http://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-2.51.tar.gz
+http://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-1.54.tar.gz
+http://cpan.metacpan.org/authors/id/D/DK/DKECHAG/Astro-Coord-Precession-0.03.tar.gz
+http://cpan.metacpan.org/authors/id/D/DK/DKECHAG/Astro-Coord-Constellations-0.01.tar.gz
+http://cpan.metacpan.org/authors/id/D/DK/DKECHAG/Math-DCT-0.04.tar.gz
+#;
+
 print "Installing reference cpan verions (with --force)...\n";
-system "$sudo cpanm -f -n http://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTML-Parser-3.76.tar.gz";
-system "$sudo cpanm -f -n http://cpan.metacpan.org/authors/id/K/KE/KENTNL/HTML-Tree-5.07.tar.gz";
-system "$sudo cpanm -f -n http://cpan.metacpan.org/authors/id/N/NI/NIGELM/HTML-Formatter-2.16.tar.gz";
-system "$sudo cpanm -f -n http://cpan.metacpan.org/authors/id/K/KA/KAMELKEV/CSS-Inliner-4014.tar.gz";
-system "$sudo cpanm -f -n http://cpan.metacpan.org/authors/id/C/CJ/CJFIELDS/BioPerl-1.7.8.tar.gz";
-system "$sudo cpanm -f -n http://cpan.metacpan.org/authors/id/E/ET/ETHER/Moose-2.2201.tar.gz";
-system "$sudo cpanm -f -n https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-2.51.tar.gz";
-system "$sudo cpanm -f -n http://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-1.54.tar.gz";
-system "$sudo cpanm -n Astro::Coord::Constellations Math::DCT Test::Harness Test::Requires";
+system "$sudo cpanm -f -n $_" foreach @packages;
+system "$sudo cpanm -n MCE::Loop Test::Harness Test::Requires";
