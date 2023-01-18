@@ -8,7 +8,7 @@ Perl benchmark that includes some workloads relevant to my real-world usage.
 `setup.pl` - Setup script (downloads/unzips data files, installs 'recommended' module versions from cpan).
 It Assumes you have at least tar/gunzip, File::Fetch and cpanm installed (e.g. `yum install perl-App-cpanminus` for CentOS 7, `apt install cpanminus` for Debian buster).
 Any true argument uses `sudo` to `cpanm` commands.
-In some systems you might need to install some modules (XML etc) with the package manager (e.g. `yum install perl-XML-LibXML perl-XML-Parser` for CentOS 7, `apt install libxml-simple-perl` for Debian buster).
+In some systems you might need to install some modules with the package manager (e.g. for XML `yum install perl-XML-LibXML perl-XML-Parser` for CentOS 7, `apt install libxml-simple-perl` for Debian/Ubuntu, others are possible like `zlib1g-dev` for zlib, `openssl-devel`/`libssl-dev` for SSL etc.).
 
 `dkbench.pl` - Benchmark run. To try and compare objectively between systems, it checks for module and perl version and warns if the 'recommended' are not found. You can disable tests that either have too many dependencies or are of less interest with `--skip_bio`, `--skip_moose`, `--skip_dt`.
 
