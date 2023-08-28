@@ -1,3 +1,7 @@
-data/*.html
 data/*.seq
-data/t/
+.DS_Store
+nytprof*
+cover_db*
+.vstags
+/.vscode/
+/.idea/
