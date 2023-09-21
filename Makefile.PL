@@ -25,8 +25,7 @@ my %WriteMakefileArgs = (
     },
     EXE_FILES     => ["dkbench", "setup_dkbench"],
     TEST_REQUIRES => {
-        'Test2::Tools::Exception' => '0',
-        'Test2::V0'               => '0',
+        'Test2::V0' => '0',
     },
     PREREQ_PM => {
         'Astro::Coord::Constellations'   => '0',
@@ -49,6 +48,7 @@ my %WriteMakefileArgs = (
         'MCE::Loop'                      => '0',
         'SQL::Inserter'                  => '0',
         'SQL::Abstract::Classic'         => '0',
+        'System::CPU'                    => '0',
         'System::Info'                   => '0',
         'Test::Harness'                  => '0',
         'Test::Requires'                 => '0',

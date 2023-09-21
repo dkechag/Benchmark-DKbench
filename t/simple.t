@@ -11,6 +11,7 @@ warn $std[0];
 my %opt = (
     iter       => 1,
     skip_bio   => 1,
+    time_piece => 1,
     time       => 1,
     quick      => 1,
     ver        => 2.1,
@@ -40,7 +41,6 @@ warn $std[0];
             threads    => 1,
             skip_prove => 1,
             bio_codons => 1,
-            skip_timep => 1,
             iter       => 2,
             no_mce     => 1,
             include    => 'Matrix'

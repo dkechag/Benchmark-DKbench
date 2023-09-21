@@ -8,7 +8,7 @@ use Digest::MD5 qw(md5_hex);
 use Encode;
 use File::Spec::Functions;
 use List::Util qw(min max sum);
-use Time::HiRes;
+use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 use Time::Piece;
 
 use Astro::Coord::Constellations 'constellation_for_eq';
@@ -29,6 +29,7 @@ use Math::MatrixReal;
 use MCE::Loop;
 use SQL::Abstract::Classic;
 use SQL::Inserter;
+use System::CPU;
 use System::Info;
 use Text::Levenshtein::Damerau::XS;
 use Text::Levenshtein::XS;
@@ -37,7 +38,7 @@ use Exporter 'import';
 our @EXPORT = qw(system_identity suite_run calc_scalability);
 our $datadir = dist_dir("Benchmark-DKbench");
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 =head1 NAME
 
@@ -75,11 +76,11 @@ package managers you can easily set up such an environment (as root or with sudo
 
  # Debian/Ubuntu etc
  apt-get update
- apt-get -y install build-essential perl cpanminus
+ apt-get install build-essential perl cpanminus
 
  # CentOS/Red Hat
  yum update
- yum -y install gcc make patch perl perl-App-cpanminus
+ yum install gcc make patch perl perl-App-cpanminus
 
 After that, you can use L<App::cpanminus> to install the benchmark suite (as
 root/sudo is the easiest, will install for all users):
@@ -114,13 +115,14 @@ options to control number of threads, iterations, which benchmarks to run etc:
  --quick,       -q     : Quick benchmark run (implies -t).
  --no_mce              : Do not run under MCE::Loop (implies -j 1).
  --skip_bio            : Skip BioPerl benchmarks.
- --skip_timep          : Skip Time::Piece benchmark (see benchmark details).
  --skip_prove          : Skip Moose prove benchmark.
+ --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
  --bio_codons          : Run optional BioPerl Codons benchmark (does not scale well).
  --sleep <i>           : Sleep for <i> secs after each benchmark.
  --setup               : Download the Genbank data to enable the BioPerl tests.
  --datapath <path>     : Override the path where the expected benchmark data is found.
  --ver <num>           : Skip benchmarks added after the specified version.
+ --help         -h     : Show basic help and exit.
 
 The default run (no options) will run all the benchmarks both single-threaded and
 multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
@@ -169,14 +171,14 @@ between systems and also for the benchmark Pass/Fail results to be reliable.
 
 =head1 BENCHMARKS
 
-The suite consists of 21 benchmarks, 20 will run by default. However, the
+The suite consists of 21 benchmarks, 19 will run by default. However, the
 C<BioPerl Monomers> requires the optional L<BioPerl> to be installed and Genbank
 data to be downloaded (C<dkbench --setup> can do the latter), so you will only
-see 19 benchmarks running just after a standard install. Because the overall score
-is an average, it is generally unaffected by skipping a benchmark or two.
+see 18 benchmarks running just after a standard install. Because the overall score
+is an average, it is generally unaffected by adding or skipping a benchmark or two.
 
-On MacOS only, the C<Time::Piece> benchmark will be skipped, unless you use C<--no_mce>
-(making it single-thread only - see why below).
+The optional benchmarks are enabled with the C<--time_piece> and C<--bio_codons>
+options.
 
 =over 4
 
@@ -244,9 +246,10 @@ changed (old Perl versions are faster but less strict in general).
 to 2500) are calculated using L<Text::Levenshtein::XS> and L<Text::Levenshtein::Damerau::XS>.
 
 =item * C<Time::Piece> : Creates and manipulates/converts Time::Piece objects. It
-is disabled by default on MacOS (unless C<--no_mce> is specified), as it runs
-extremely slow when forked on this platform. In general you may want to skip this
-benchmark (C<--skip_timep>) if you are comparing different OS platforms.
+is disabled by default because it uses the OS time libraries, so it might skew results
+if you are trying to compare CPUs on different OS platforms. It can be enabled with
+the C<--time_piece> option. For MacOS specifically, it can only be enabled if C<--no_mce>
+is specified, as it runs extremely slow when forked.
 
 =back
 
@@ -297,12 +300,13 @@ reference setup with Perl 5.36.0):
 
  CPU                                     Cores/HT   Single   Multi   Scalability
  Intel i7-4750HQ @ 2.0 (MacOS)                4/8     612     2332      46.9%
- AMD Ryzen 5 PRO 4650U @ 2.1 (WSL)           6/12     906     4166      38.2% 
+ AMD Ryzen 5 PRO 4650U @ 2.1 (WSL)           6/12     905     4444      40.6%
  Apple M1 Pro @ 3.2 (MacOS)                 10/10    1283    10026      78.8%
  Apple M2 Pro @ 3.5 (MacOS)                 12/12    1415    12394      73.1%
  Ampere Altra @ 3.0 (Linux)                 48/48     708    32718      97.7%
  Intel Xeon Platinum 8481C @ 2.7 (Linux)   88/176    1000    86055      48.9%
  AMD EPYC Milan 7B13 @ 2.45 (Linux)       112/224     956   104536      49.3%
+ AMD EPYC Genoa 9B14 @ 2.7 (Linux)        180/360    1197   221622      51.4%
 
 =head1 AUTHOR
 
@@ -355,21 +359,14 @@ sub benchmark_list {
 }
 
 sub system_identity {
-    my ($physical, $cores, $ncpu) =
-        $^O =~ /bsd|darwin|dragonfly/ ? bsd_cpu() : linux_cpu();
-    $ncpu ||= MCE::Util::get_ncpu() || 1;
+    my ($physical, $cores, $ncpu) = System::CPU::get_cpu;
+    $ncpu ||= 1;
     local $^O = 'linux' if $^O =~ /android/;
     my $info  = System::Info->sysinfo_hash;
     my $osn   = $info->{distro} || $info->{os} || $^O;
-    my $model = $info->{cpu};
-    my $arch  = $info->{cpu_type} || '';
+    my $model = System::CPU::get_name || '';
+    my $arch  = System::CPU::get_arch || '';
     $arch = " ($arch)" if $arch;
-    if ($^O =~ /darwin/ && $model =~ /^Mac|nknown/) {
-        my $brand = `sysctl -a |grep brand`;
-        $model = $1 if $brand =~ /brand_string: (.*)/;
-    }
-    $model =~ s/\s+/ /g;
-    $model =~ s/\(R\)//g;
     print "--------------- Software ---------------\nDKbench v$VERSION\n";
     print "Perl $^V\n";
     print "OS: $osn\n--------------- Hardware ---------------\n";
@@ -384,34 +381,6 @@ sub system_identity {
 
     return $ncpu;
 };
-
-sub bsd_cpu {
-    chomp( my $cpus = `sysctl -n hw.ncpu 2>/dev/null` );
-    return unless $cpus;
-    chomp( my $cores = `sysctl -n hw.physicalcpu 2>/dev/null` );
-    $cores ||= $cpus;
-    return (undef, $cores, $cpus);
-}
-
-sub linux_cpu {
-    my (@physical, @cores, $phys, $cpus);
-    if ( -f '/proc/cpuinfo' && open my $fh, '<', '/proc/cpuinfo' ) {
-        while (<$fh>) {
-            $cpus++ if /^processor\s*:/;
-            push @physical, $1 if /^physical id\s*:\s*(\d+)/;
-            push @cores, $1 if /^cpu cores\s*:\s*(\d+)/;
-        }
-        return undef, $cores[0], $cpus if !@physical && @cores;
-        @cores = (0) unless @cores;
-        my %hash;
-        $hash{$physical[$_]} = $_ < scalar(@cores) ? $cores[$_] : $cores[0]
-            for 0 .. $#physical;
-        my $phys  = keys %hash || undef;
-        my $cores = sum(values %hash) || $cpus;
-        return $phys, $cores, $cpus;
-    }
-    return;
-}
 
 sub suite_run {
     my $opt = shift;
@@ -481,7 +450,7 @@ sub run_iteration {
         next if $opt->{skip_bio} && $bench =~ /Monomers/;
         next if $opt->{skip_prove} && $bench =~ /prove/;
         next if !$opt->{bio_codons} && $bench =~ /Codons/;
-        next if $opt->{skip_timep} && $bench =~ /Time::Piece/;
+        next if !$opt->{time_piece} && $bench =~ /Time::Piece/;
         next if $opt->{ver} && $benchmarks->{$bench}->[5] && $opt->{ver} < $benchmarks->{$bench}->[5];
         next if $opt->{exclude} && $bench =~ /$opt->{exclude}/;
         next if $opt->{include} && $bench !~ /$opt->{include}/;
@@ -538,9 +507,9 @@ sub bench_run {
     my ($benchmark, $srand) = @_;
     $srand //= 1;
     srand($srand); # For repeatability
-    my $t0   = Time::HiRes::time();
+    my $t0   = clock_gettime(CLOCK_MONOTONIC);
     my $out  = $benchmark->[2]->($benchmark->[3]);
-    my $time = sprintf("%.3f", Time::HiRes::time()-$t0);
+    my $time = sprintf("%.3f", clock_gettime(CLOCK_MONOTONIC)-$t0);
     my $r    = $out eq $benchmark->[0] ? 'Pass' : "Fail ($out)";
     return $time, $r;
 }

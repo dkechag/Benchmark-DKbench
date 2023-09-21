@@ -8,7 +8,9 @@ setup_dkbench - DKbench Perl CPU Benchmark utility setup script
 
 This is a setup script, part of the L<Benchmark::DKbench> distribution.
 
-Refer to the distribution POD for more information on the DKbench suite.
+Refer to the distribution POD for more information on the DKbench suite:
+
+ perldoc Benchmark::DKbench
 
 =head1 SYNOPSIS
 
@@ -39,11 +41,11 @@ most popular pqckage managers (run as root or with sudo):
 
  # Debian/Ubuntu etc
  apt-get update
- apt-get -y install wget build-essential perl cpanminus libxml-simple-perl
+ apt-get install wget build-essential perl cpanminus libxml-simple-perl
 
  # CentOS/Redhat
  yum update
- yum -y install wget gcc make patch perl perl-App-cpanminus perl-XML-LibXML perl-XML-Parser
+ yum install wget gcc make patch perl perl-App-cpanminus perl-XML-LibXML perl-XML-Parser
 
 The above will have you ready for using the default (system) perl. If you want to
 specifically install the reference perl version for this suite (currently 5.36.0),

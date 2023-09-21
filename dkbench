@@ -8,7 +8,37 @@ dkbench - DKbench Perl Benchmark launch script
 
 This is the benchmarking script, part of the L<Benchmark::DKbench> distribution.
 
-See POD on the main module for info.
+See POD on the main module for info:
+
+ perldoc Benchmark::DKbench
+
+=head1 SYNOPSIS
+
+ dkbench [options]
+
+ Options:
+ --threads <i>, -j <i> : Number of benchmark threads (default is 1).
+ --multi,       -m     : Multi-threaded using all your CPU cores/threads.
+ --max_threads <i>     : Override the cpu detection to specify max cpu threads.
+ --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
+ --include <regex>     : Run only benchmarks that match regex.
+ --exclude <regex>     : Do not run benchmarks that match regex.
+ --time,        -t     : Report time (sec) instead of score.
+ --quick,       -q     : Quick benchmark run (implies -t).
+ --no_mce              : Do not run under MCE::Loop (implies -j 1).
+ --skip_bio            : Skip BioPerl benchmarks.
+ --skip_prove          : Skip Moose prove benchmark.
+ --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
+ --bio_codons          : Run optional BioPerl Codons benchmark (does not scale well).
+ --sleep <i>           : Sleep for <i> secs after each benchmark.
+ --setup               : Download the Genbank data to enable the BioPerl tests.
+ --datapath <path>     : Override the path where the expected benchmark data is found.
+ --ver <num>           : Skip benchmarks added after the specified version.
+ --help         -h     : Show basic help and exit.
+
+The default run (no options) will run all the benchmarks both single-threaded and
+multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
+multi vs single threaded scalability.
 
 =cut
 
@@ -23,13 +53,14 @@ use Benchmark::DKbench::Setup;
 use File::Spec::Functions;
 use FindBin;
 use Getopt::Long;
+use Pod::Usage;
 
 my %opt = ();
 GetOptions (
     \%opt,
     'skip_bio',
-    'skip_timep',
     'skip_prove',
+    'time_piece',
     'bio_codons',
     'quick|q',
     'time|t',
@@ -45,7 +76,10 @@ GetOptions (
     'ver=s',
     'setup',
     'datapath=s',
+    'help|h',
 );
+
+pod2usage({ -verbose => 1, -output => \*STDOUT, -noperldoc => 1}) if $opt{help};
 
 $opt{iter} ||= 1;
 $opt{repeat} ||= 1;
@@ -113,8 +147,8 @@ sub check_kit {
         warn "!! gbbct5.seq missing, applying --skip_bio. Use --setup to fetch (or setup_dkbench).\n";
     }
 
-    if (!$opt{skip_timep} && $^O =~ /darwin/ && !$opt{no_mce}) {
-        $opt{skip_timep} = 1;
-        warn "!! Running localtime forked on MacOS is extremely slow, applying --skip_timep. You may run it with --no_mce.\n"
+    if ($opt{time_piece} && $^O =~ /darwin/ && !$opt{no_mce}) {
+        $opt{time_piece} = 0;
+        warn "!! Running localtime forked on MacOS is extremely slow, disabling Time::Piece. You may run it with --no_mce.\n"
     }
 }
