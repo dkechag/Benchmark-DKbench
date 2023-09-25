@@ -28,6 +28,12 @@ scenario.
 
 # INSTALLATION
 
+See the ["setup\_dkbench"](#setup_dkbench) script below for more on the installation of a couple
+of optional benchmarks and standardizing your benchmarking environment, otherwise
+here are some general guidelines for verious systems.
+
+## Linux / WSL etc
+
 The only non-CPAN software required to install/run the suite is a build environment
 for the C/XS modules (C compiler, make etc.) and Perl. On the most popular Linux
 package managers you can easily set up such an environment (as root or with sudo):
@@ -45,8 +51,34 @@ root/sudo is the easiest, will install for all users):
 
     cpanm -n Benchmark::DKbench
 
-See the `setup_dkbench` script below for more on the installation of a couple of
-optional benchmarks and standardizing your benchmarking environment.
+## Solaris
+
+You will need to install the Oracle Solaris Studio development package to have a
+compiler environment, and to add its `bin` directory to your PATH, before installing
+the benchmark suite.
+
+## Strawberry Perl
+
+If you are on Windows, you should be using the Windows Subsystem for Linux (WSL)
+for running Perl or, if you can't (e.g. old Windows verions), cygwin instead.
+The suite should still work on Strawberry Perl, as long as you don't try to run
+tests when installing (some dependencies will not pass them). The simplest way is
+with [App::cpanminus](https://metacpan.org/pod/App%3A%3Acpanminus) (most Strawberry Perl verions have it installed):
+
+    cpanm -n Benchmark::DKbench
+
+otherwise with the base CPAN shell:
+
+    perl -MCPAN -e shell
+
+    > notest install Benchmark::DKbench
+
+and then note that the scripts get the batch extension appended, so `dkbench.bat`
+runs the suite (and `setup_dkbench.bat` can assist with module versions, optional
+benchmarks etc.).
+
+Be aware that Strawberry Perl is slower, on my test system I get almost 50% slower
+performance than WSL and 30% slower than cygwin.
 
 # SCRIPTS
 
@@ -88,7 +120,8 @@ multi vs single threaded scalability.
 
 The scores are calibrated such that a reference CPU (Intel Xeon Platinum 8481C -
 Sapphire Rapids) would achieve a score of 1000 in a single-core benchmark run using
-the default software configuration (Linux/Perl 5.36.0 with reference CPAN modules).
+the default software configuration (Linux/Perl 5.36.0 built with multiplicity and
+threads, with reference CPAN module versions).
 
 The multi-thread scalability should approach 100% if each thread runs on a full core
 (i.e. no SMT), and the core can maintain the clock speed it had on the single-thread
@@ -106,7 +139,7 @@ there is an option to disable it, which forces a single-thread run.
 Simple installer to check/get the reference versions of CPAN modules and download
 the Genbank data file required for the BioPerl benchmarks of the DKbench suite.
 
-It assumes that you have some software already installed (see INSTALLATION above),
+It assumes that you have some software already installed (see ["INSTALLATION"](#installation) above),
 try `setup_dkbench --help` will give you more details.
 
     setup_dkbench [--force --sudo --test --data=s --help]

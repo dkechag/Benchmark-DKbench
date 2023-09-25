@@ -6,7 +6,7 @@ use File::ShareDir 'dist_dir';
 my $threads;
 my @std = capture {$threads = system_identity()};
 like($std[0], qr/CPU/, 'System identity');
-warn $std[0];
+diag $std[0];
 
 my %opt = (
     iter       => 1,
@@ -20,13 +20,13 @@ my %opt = (
 my (%stats1, %stats2);
 @std = capture {%stats1 = suite_run({%opt, no_mce=>1})};
 like($std[0], qr/Overall Time/, 'Bench');
-warn $std[0];
+diag $std[0];
 
 if ($threads && $threads > 1) {
     $opt{include} = 'Astro';
     $opt{ver}     = 1;
     @std = capture {%stats2 = suite_run({%opt, threads=>2})};
-    warn $std[0];
+    diag $std[0];
 } else {
     %stats2 = %stats1;
     $stats2{threads} = 2;
@@ -34,7 +34,7 @@ if ($threads && $threads > 1) {
 
 @std = capture {calc_scalability(\%opt, \%stats1, \%stats2)};
 like($std[0], qr/scalability/, 'Scalability');
-warn $std[0];
+diag $std[0];
 
 @std = capture {
     %stats1 = suite_run({
@@ -48,7 +48,7 @@ warn $std[0];
     )
 };
 like($std[0], qr/Overall Avg Score/, 'Aggregate');
-warn $std[0];
+diag $std[0];
 
 %stats2 = %stats1;
 $stats2{threads} = 2;

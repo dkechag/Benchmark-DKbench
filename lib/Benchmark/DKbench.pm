@@ -3,12 +3,13 @@ package Benchmark::DKbench;
 use strict;
 use warnings;
 
+use Config;
 use Digest;
 use Digest::MD5 qw(md5_hex);
 use Encode;
 use File::Spec::Functions;
 use List::Util qw(min max sum);
-use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
+use Time::HiRes qw(CLOCK_MONOTONIC);
 use Time::Piece;
 
 use Astro::Coord::Constellations 'constellation_for_eq';
@@ -35,10 +36,11 @@ use Text::Levenshtein::Damerau::XS;
 use Text::Levenshtein::XS;
 
 use Exporter 'import';
-our @EXPORT = qw(system_identity suite_run calc_scalability);
-our $datadir = dist_dir("Benchmark-DKbench");
+our @EXPORT    = qw(system_identity suite_run calc_scalability);
+our $datadir   = dist_dir("Benchmark-DKbench");
+my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.2';
+our $VERSION = '2.3';
 
 =head1 NAME
 
@@ -70,6 +72,12 @@ scenario.
 
 =head1 INSTALLATION
 
+See the L</"setup_dkbench"> script below for more on the installation of a couple
+of optional benchmarks and standardizing your benchmarking environment, otherwise
+here are some general guidelines for verious systems.
+
+=head2 Linux / WSL etc
+
 The only non-CPAN software required to install/run the suite is a build environment
 for the C/XS modules (C compiler, make etc.) and Perl. On the most popular Linux
 package managers you can easily set up such an environment (as root or with sudo):
@@ -87,8 +95,34 @@ root/sudo is the easiest, will install for all users):
 
  cpanm -n Benchmark::DKbench
 
-See the C<setup_dkbench> script below for more on the installation of a couple of
-optional benchmarks and standardizing your benchmarking environment.
+=head2 Solaris
+
+You will need to install the Oracle Solaris Studio development package to have a
+compiler environment, and to add its C<bin> directory to your PATH, before installing
+the benchmark suite.
+
+=head2 Strawberry Perl
+
+If you are on Windows, you should be using the Windows Subsystem for Linux (WSL)
+for running Perl or, if you can't (e.g. old Windows verions), cygwin instead.
+The suite should still work on Strawberry Perl, as long as you don't try to run
+tests when installing (some dependencies will not pass them). The simplest way is
+with L<App::cpanminus> (most Strawberry Perl verions have it installed):
+
+ cpanm -n Benchmark::DKbench
+
+otherwise with the base CPAN shell:
+
+ perl -MCPAN -e shell
+
+ > notest install Benchmark::DKbench
+
+and then note that the scripts get the batch extension appended, so C<dkbench.bat>
+runs the suite (and C<setup_dkbench.bat> can assist with module versions, optional
+benchmarks etc.).
+
+Be aware that Strawberry Perl is slower, on my test system I get almost 50% slower
+performance than WSL and 30% slower than cygwin.
 
 =head1 SCRIPTS
 
@@ -130,7 +164,8 @@ multi vs single threaded scalability.
 
 The scores are calibrated such that a reference CPU (Intel Xeon Platinum 8481C -
 Sapphire Rapids) would achieve a score of 1000 in a single-core benchmark run using
-the default software configuration (Linux/Perl 5.36.0 with reference CPAN modules).
+the default software configuration (Linux/Perl 5.36.0 built with multiplicity and
+threads, with reference CPAN module versions).
 
 The multi-thread scalability should approach 100% if each thread runs on a full core
 (i.e. no SMT), and the core can maintain the clock speed it had on the single-thread
@@ -148,7 +183,7 @@ there is an option to disable it, which forces a single-thread run.
 Simple installer to check/get the reference versions of CPAN modules and download
 the Genbank data file required for the BioPerl benchmarks of the DKbench suite.
 
-It assumes that you have some software already installed (see INSTALLATION above),
+It assumes that you have some software already installed (see L</"INSTALLATION"> above),
 try C<setup_dkbench --help> will give you more details.
 
  setup_dkbench [--force --sudo --test --data=s --help]
@@ -368,7 +403,9 @@ sub system_identity {
     my $arch  = System::CPU::get_arch || '';
     $arch = " ($arch)" if $arch;
     print "--------------- Software ---------------\nDKbench v$VERSION\n";
-    print "Perl $^V\n";
+    printf "Perl $^V (%sthreads, %smulti)\n",
+        $Config{usethreads}      ? '' : 'no ',
+        $Config{usemultiplicity} ? '' : 'no ',;
     print "OS: $osn\n--------------- Hardware ---------------\n";
     print "CPU type: $model$arch\n";
     print "CPUs: $ncpu";
@@ -507,9 +544,9 @@ sub bench_run {
     my ($benchmark, $srand) = @_;
     $srand //= 1;
     srand($srand); # For repeatability
-    my $t0   = clock_gettime(CLOCK_MONOTONIC);
+    my $t0   = _get_time();
     my $out  = $benchmark->[2]->($benchmark->[3]);
-    my $time = sprintf("%.3f", clock_gettime(CLOCK_MONOTONIC)-$t0);
+    my $time = sprintf("%.3f", _get_time()-$t0);
     my $r    = $out eq $benchmark->[0] ? 'Pass' : "Fail ($out)";
     return $time, $r;
 }
@@ -1216,6 +1253,10 @@ sub _decode_jwt2 {
     }
     return ($header, $payload) if $args{decode_header};
     return $payload;
+}
+
+sub _get_time {
+    return $mono_clock ? Time::HiRes::clock_gettime(CLOCK_MONOTONIC) : Time::HiRes::time();
 }
 
 # Helper package for Moose benchmark

@@ -112,7 +112,7 @@ if ($opt{threads} || !$max_threads || $max_threads == 1) {
 }
 
 sub check_kit {
-    warn "! Perl version v5.36.0 recommended as a comparison base\n"
+    warn "! Perl version v5.36 recommended as a comparison base\n"
         unless $^V =~ /v5.36.\d/;
 
     my %mod_ver = Benchmark::DKbench::Setup::cpan_versions();
@@ -123,7 +123,7 @@ sub check_kit {
         my $ver = eval "\$${module}::VERSION" || 'none';
         unless ($ver eq $mod_ver{$module}) {
             my $msg = "! $module $mod_ver{$module} recommended as a comparison base ($ver found).";
-            $msg .= " Older installed versions may cause issues to benchmarks."
+            $msg .= " Older versions may show benchmark failures."
                 if $mod_ver{$module} cmp $ver; # $ver is less
             if ($module =~ /^Bio/ && $ver eq 'none') {
                 $opt{skip_bio}   = 1;
