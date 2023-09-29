@@ -99,11 +99,13 @@ options to control number of threads, iterations, which benchmarks to run etc:
     --multi,       -m     : Multi-threaded using all your CPU cores/threads.
     --max_threads <i>     : Override the cpu detection to specify max cpu threads.
     --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
+    --stdev               : Show relative standard deviation (for iter > 1).
     --include <regex>     : Run only benchmarks that match regex.
     --exclude <regex>     : Do not run benchmarks that match regex.
     --time,        -t     : Report time (sec) instead of score.
     --quick,       -q     : Quick benchmark run (implies -t).
     --no_mce              : Do not run under MCE::Loop (implies -j 1).
+    --scale <i>,   -s <i> : Scale the bench workload by x times.
     --skip_bio            : Skip BioPerl benchmarks.
     --skip_prove          : Skip Moose prove benchmark.
     --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
@@ -121,18 +123,26 @@ multi vs single threaded scalability.
 The scores are calibrated such that a reference CPU (Intel Xeon Platinum 8481C -
 Sapphire Rapids) would achieve a score of 1000 in a single-core benchmark run using
 the default software configuration (Linux/Perl 5.36.0 built with multiplicity and
-threads, with reference CPAN module versions).
+threads, with reference CPAN module versions). Perl built without thread support and
+multi(plicity) will be a bit faster (usually in the order of ~3-4%), while older Perl
+versions will most likely be slower. Different CPAN module versions will also impact
+scores, using `setup_dkbench` is a way to ensure a reference environment for more
+meaningful hardware comparisons.
 
-The multi-thread scalability should approach 100% if each thread runs on a full core
-(i.e. no SMT), and the core can maintain the clock speed it had on the single-thread
-runs. Note that the overall scalability is an average of the benchmarks that drops
-non-scaling outliers (over 2\*stdev less than the mean).
+The multi-thread scalability calculated by the suite should approach 100% if each
+thread runs on a full core (i.e. no SMT), and the core can maintain the clock speed
+it had on the single-thread runs. Note that the overall scalability is an average
+of the benchmarks that drops non-scaling outliers (over 2\*stdev less than the mean).
+
+If you want to reduce the effects of thermal throttling, which will lower the speed
+of (mainly multi-threaded) benchmarks as the CPU temperature increases, the `sleep`
+option can help by adding cooldown time between each benchmark.
 
 The suite will report a Pass/Fail per benchmark. A failure may be caused if you have
 different CPAN module version installed - this is normal, and you will be warned.
 
-The suite uses [MCE::Loop](https://metacpan.org/pod/MCE%3A%3ALoop) to run on the desired number of parallel threads, although
-there is an option to disable it, which forces a single-thread run.
+[MCE::Loop](https://metacpan.org/pod/MCE%3A%3ALoop) is used to run on the desired number of parallel threads, with minimal
+overhead., There is an option to disable it, which forces a single-thread run.
 
 ## `setup_dkbench`
 
@@ -238,6 +248,9 @@ Prints out software/hardware configuration and returns then number of cores dete
 Runs the benchmark suite given the `%options` and prints results. Returns a hash
 with run stats.
 
+The options accepted are the same as the `dkbench` script (in their long form),
+except `help`, `setup` and `max_threads` which are command-line only.
+
 ## `calc_scalability`
 
     calc_scalability(\%options, \%stat_single, \%stat_multi);
@@ -263,7 +276,7 @@ actual workload.
 ## SCORES
 
 Some sample DKbench score results from various systems for comparison (all on
-reference setup with Perl 5.36.0):
+reference setup with Perl 5.36.0 thread-multi):
 
     CPU                                     Cores/HT   Single   Multi   Scalability
     Intel i7-4750HQ @ 2.0 (MacOS)                4/8     612     2332      46.9%

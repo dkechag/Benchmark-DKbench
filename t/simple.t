@@ -42,6 +42,7 @@ diag $std[0];
             skip_prove => 1,
             bio_codons => 1,
             iter       => 2,
+            stdev      => 1,
             no_mce     => 1,
             include    => 'Matrix'
         }
@@ -60,7 +61,7 @@ calc_scalability({}, \%stats1, \%stats2);
             time    => 1,
             quick   => 1,
             iter    => 2,
-            repeat  => 1,
+            scale   => 1,
             no_mce  => 1,
             include => 'DCT',
         }
@@ -76,7 +77,7 @@ my $datadir = dist_dir("Benchmark-DKbench");
             threads  => 1,
             time     => 1,
             iter     => 1,
-            repeat   => 1,
+            scale    => 1,
             no_mce   => 1,
             include  => 'prove',
         }

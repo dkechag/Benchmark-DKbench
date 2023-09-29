@@ -1,5 +1,8 @@
 Revision history for Benchmark-DKbench
 
+2.4     2023-09-29
+        - Added --scale and --stdev options.
+
 2.3     2023-09-25
         - Show Perl threads/multi config.
         - Minimum module version for passing benchmarks.

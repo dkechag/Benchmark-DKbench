@@ -21,11 +21,13 @@ See POD on the main module for info:
  --multi,       -m     : Multi-threaded using all your CPU cores/threads.
  --max_threads <i>     : Override the cpu detection to specify max cpu threads.
  --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
+ --stdev               : Show relative standard deviation (for iter > 1).
  --include <regex>     : Run only benchmarks that match regex.
  --exclude <regex>     : Do not run benchmarks that match regex.
  --time,        -t     : Report time (sec) instead of score.
  --quick,       -q     : Quick benchmark run (implies -t).
  --no_mce              : Do not run under MCE::Loop (implies -j 1).
+ --scale <i>,   -s <i> : Scale the bench workload by x times.
  --skip_bio            : Skip BioPerl benchmarks.
  --skip_prove          : Skip Moose prove benchmark.
  --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
@@ -70,9 +72,10 @@ GetOptions (
     'max_threads=i',
     'include=s',
     'exclude=s',
-    'repeat|r=i',
+    'scale|s=i',
     'no_mce|n',
     'sleep=i',
+    'stdev',
     'ver=s',
     'setup',
     'datapath=s',
@@ -81,9 +84,9 @@ GetOptions (
 
 pod2usage({ -verbose => 1, -output => \*STDOUT, -noperldoc => 1}) if $opt{help};
 
-$opt{iter} ||= 1;
-$opt{repeat} ||= 1;
-$opt{time} = 1 if $opt{quick} || $opt{repeat} > 1;
+$opt{iter}  ||= 1;
+$opt{scale} ||= 1;
+$opt{time} = 1 if $opt{quick};
 
 Benchmark::DKbench::Setup::fetch_genbank($opt{datapath}) if $opt{setup};
 
