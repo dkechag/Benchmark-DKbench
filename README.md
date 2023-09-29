@@ -105,7 +105,7 @@ options to control number of threads, iterations, which benchmarks to run etc:
     --time,        -t     : Report time (sec) instead of score.
     --quick,       -q     : Quick benchmark run (implies -t).
     --no_mce              : Do not run under MCE::Loop (implies -j 1).
-    --scale <i>,   -s <i> : Scale the bench workload by x times.
+    --scale <i>,   -s <i> : Scale the bench workload by x times (incompatible with -q).
     --skip_bio            : Skip BioPerl benchmarks.
     --skip_prove          : Skip Moose prove benchmark.
     --time_piece          : Run optional Time::Piece benchmark (see benchmark details).

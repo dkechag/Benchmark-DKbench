@@ -149,7 +149,7 @@ options to control number of threads, iterations, which benchmarks to run etc:
  --time,        -t     : Report time (sec) instead of score.
  --quick,       -q     : Quick benchmark run (implies -t).
  --no_mce              : Do not run under MCE::Loop (implies -j 1).
- --scale <i>,   -s <i> : Scale the bench workload by x times.
+ --scale <i>,   -s <i> : Scale the bench workload by x times (incompatible with -q).
  --skip_bio            : Skip BioPerl benchmarks.
  --skip_prove          : Skip Moose prove benchmark.
  --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
@@ -477,7 +477,14 @@ sub calc_scalability {
     print (("-"x40)."\n");
     my $avg1 = min_max_avg($stats1->{total}->{$display});
     my $avg2 = min_max_avg($stats2->{total}->{$display});
-    print "DKbench summary ($cnt benchmarks, $stats2->{threads} threads):\n";
+    print "DKbench summary ($cnt benchmark";
+    print "s" if $cnt > 1;
+    print " x$opt->{scale} scale" if $opt->{scale} && $opt->{scale} > 1;
+    print ", $opt->{iter} iterations" if $opt->{iter} && $opt->{iter} > 1;
+    print ", $stats2->{threads} thread";
+    print "s" if $stats2->{threads} > 1;
+    print "):\n";
+    $opt->{f} .= "s" if $opt->{time};
     print pad_to("Single:").sprintf($opt->{f}, $avg1)."\n";
     print pad_to("Multi:").sprintf($opt->{f}, $avg2)."\n";
     my @newperf = Benchmark::DKbench::drop_outliers(\@perf, -1);
@@ -1045,7 +1052,7 @@ sub total_stats {
     my $benchmarks = benchmark_list();
     my $display = $opt->{time} ? 'times' : 'scores';
     my $title   = $opt->{time} ? 'Time (sec)' : 'Score';
-    print "Aggregates:\n".pad_to("Benchmark",24).pad_to("Avg $title").pad_to("Min $title").pad_to("Max $title");
+    print "Aggregates ($opt->{iter} iterations):\n".pad_to("Benchmark",24).pad_to("Avg $title").pad_to("Min $title").pad_to("Max $title");
     print pad_to("stdev %") if $opt->{stdev};
     print pad_to("Pass %") unless $opt->{time};
     print "\n";

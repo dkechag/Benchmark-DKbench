@@ -67,7 +67,7 @@ calc_scalability({}, \%stats1, \%stats2);
         }
     )
 };
-like($std[0], qr/Overall Avg Time/, 'Aggregate');
+like($std[0], qr/2 iterations\)/, 'Aggregate');
 
 my $datadir = dist_dir("Benchmark-DKbench");
 
