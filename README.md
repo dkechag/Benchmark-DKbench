@@ -24,7 +24,7 @@ performance of systems when running computationally intensive Perl (both pure Pe
 and C/XS) workloads. It is a good overall indicator for generic CPU performance in
 real-world scenarios. It runs single and multi-threaded (able to scale to hundreds
 of CPUs) and can be fully customized to run the benchmarks that better suit your own
-scenario.
+scenario - even allowing you to add your own custom benchmarks.
 
 # INSTALLATION
 
@@ -248,8 +248,20 @@ Prints out software/hardware configuration and returns then number of cores dete
 Runs the benchmark suite given the `%options` and prints results. Returns a hash
 with run stats.
 
-The options accepted are the same as the `dkbench` script (in their long form),
-except `help`, `setup` and `max_threads` which are command-line only.
+The options of the `dkbench` script (in their long form) are accepted, except
+`help`, `setup` and `max_threads` which are exclusive to the command-line script.
+
+In addition, `%options` may contain the key `%extra_bench`, with a hashref value
+containing custom benchmarks in the following format:
+
+    extra_bench => { bench_name => [$exp_output, $ref_time, $coderef, $quick_arg, $normal_arg] ... }
+
+Where `bench_name` is a unique name for each benchmark and the arrayref assigned
+to it contains: The expected output (string) for the test to be considered a pass,
+the reference time in seconds for a score of 1000, a reference to the actual bench
+function, an argument (workload scaling) to pass to the function for the `quick` 
+bench run and an argument to pass for the normal run. For more info with an example
+see the ["CUSTOM BENCHMARKS"](#custom-benchmarks) section.
 
 ## `calc_scalability`
 
@@ -257,6 +269,44 @@ except `help`, `setup` and `max_threads` which are command-line only.
 
 Given the `%stat_single` results of a single-threaded `suite_run` and `%stat_multi`
 results of a multi-threaded run, will calculate and print the multi-thread scalability.
+
+# CUSTOM BENCHMARKS
+
+Version 2.5 introduced the ability to add custom benchmarks to be run along any
+of the included ones of the suite. This allows you to create a suite that is more
+relevant to you, by including the actual code you will be running on the systems
+you are benchmarking. Remember, the best benchmark is your own code.
+
+Here is an example of adding a benchmark to the test suite and running it together
+with the default benchmarks:
+
+    use Benchmark::DKbench;
+    use Math::Trig qw/:great_circle :pi/;
+
+    sub great_circle {
+      my $iter = shift || 1;  # Optionally have an argument that scales the workload
+      my $dist = 0;
+      $dist +=
+        great_circle_distance(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) -
+        great_circle_bearing(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) +
+        great_circle_direction(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi))
+        for 1 .. $iter;
+      return $dist;
+    }
+
+    my %stats = suite_run({
+        extra_bench => { 'Math::Trig' =>  # A unique name for the benchmark
+          [
+          '3144042.81433949',  # The output for your reference Perl - determines Pass/Fail
+          5.5,                 # Seconds to complete in normal mode for score = 1000
+          \&great_circle,      # Reference to bench function
+          400000,              # Argument to pass for --quick mode (if needed)
+          2000000              # Argument to pass for normal mode (if needed)
+          ]},
+      }
+    );
+
+You can pass the `include` option to run only the custom benchmark(s).
 
 # NOTES
 
@@ -305,7 +355,7 @@ I will be notified, and then you'll automatically be notified of progress on you
 
 # LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2021-2023 by Dimitrios Kechagias.
+This software is copyright (c) 2021-2024 by Dimitrios Kechagias.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
