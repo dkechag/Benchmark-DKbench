@@ -30,7 +30,7 @@ scenario - even allowing you to add your own custom benchmarks.
 
 See the ["setup\_dkbench"](#setup_dkbench) script below for more on the installation of a couple
 of optional benchmarks and standardizing your benchmarking environment, otherwise
-here are some general guidelines for verious systems.
+here are some general guidelines for various systems.
 
 ## Linux / WSL etc
 
@@ -60,7 +60,7 @@ the benchmark suite.
 ## Strawberry Perl
 
 If you are on Windows, you should be using the Windows Subsystem for Linux (WSL)
-for running Perl or, if you can't (e.g. old Windows verions), cygwin instead.
+for running Perl or, if you can't (e.g. old Windows versions), cygwin instead.
 The suite should still work on Strawberry Perl, as long as you don't try to run
 tests when installing (some dependencies will not pass them). The simplest way is
 with [App::cpanminus](https://metacpan.org/pod/App%3A%3Acpanminus) (most Strawberry Perl verions have it installed):
@@ -239,7 +239,7 @@ exported functions that the `dkbench` script uses for reference:
 
     my $cores = system_identity();
 
-Prints out software/hardware configuration and returns then number of cores detected.
+Prints out software/hardware configuration and returns the number of cores detected.
 
 ## `suite_run`
 
@@ -254,14 +254,17 @@ The options of the `dkbench` script (in their long form) are accepted, except
 In addition, `%options` may contain the key `%extra_bench`, with a hashref value
 containing custom benchmarks in the following format:
 
-    extra_bench => { bench_name => [$exp_output, $ref_time, $coderef, $quick_arg, $normal_arg] ... }
+    extra_bench => { bench_name => [$coderef, $exp_output, $ref_time, $quick_arg, $normal_arg], ... }
 
 Where `bench_name` is a unique name for each benchmark and the arrayref assigned
-to it contains: The expected output (string) for the test to be considered a pass,
-the reference time in seconds for a score of 1000, a reference to the actual bench
-function, an argument (workload scaling) to pass to the function for the `quick` 
-bench run and an argument to pass for the normal run. For more info with an example
-see the ["CUSTOM BENCHMARKS"](#custom-benchmarks) section.
+to it contains: A reference to the benchmarking code, the expected output (string)
+for the test to be considered a pass, the reference time in seconds for a score of
+1000, an argument (workload scaling) to pass to the function for the `quick` bench
+run and an argument to pass for the normal run. If the second argument is undef,
+a "Pass" is always recorded, if the third argument is not defined and non-zero,
+`time` will be implied.
+
+For more info with an example see the ["CUSTOM BENCHMARKS"](#custom-benchmarks) section.
 
 ## `calc_scalability`
 
@@ -275,7 +278,7 @@ results of a multi-threaded run, will calculate and print the multi-thread scala
 Version 2.5 introduced the ability to add custom benchmarks to be run along any
 of the included ones of the suite. This allows you to create a suite that is more
 relevant to you, by including the actual code you will be running on the systems
-you are benchmarking. Remember, the best benchmark is your own code.
+you are benchmarking.
 
 Here is an example of adding a benchmark to the test suite and running it together
 with the default benchmarks:
@@ -291,22 +294,31 @@ with the default benchmarks:
         great_circle_bearing(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) +
         great_circle_direction(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi))
         for 1 .. $iter;
-      return $dist;
+      return $dist; # Returning something is optional, but is used to Fail bench on no match
     }
 
     my %stats = suite_run({
         extra_bench => { 'Math::Trig' =>  # A unique name for the benchmark
           [
-          '3144042.81433949',  # The output for your reference Perl - determines Pass/Fail
-          5.5,                 # Seconds to complete in normal mode for score = 1000
           \&great_circle,      # Reference to bench function
-          400000,              # Argument to pass for --quick mode (if needed)
-          2000000              # Argument to pass for normal mode (if needed)
+          '3144042.81433949',  # Output for your reference Perl - determines Pass/Fail (optional)
+          5.5,                 # Seconds to complete in normal mode for score = 1000 (optional)
+          400000,              # Argument to pass for --quick mode (optional)
+          2000000              # Argument to pass for normal mode (optional)
           ]},
       }
     );
 
-You can pass the `include` option to run only the custom benchmark(s).
+You can use a prefix for the naming of your custom benchmarks and make use of the
+`include` argument to run only the custom benchmarks. Here is an example, where
+a custom test is defined inline, without any of the optional arguments and specified
+to run by itself:
+
+    my %stats = suite_run({
+        include     => 'custom',
+        extra_bench => { custom1 => [sub {split //, 'x'x$_ for 1..10000}] }
+      }
+    );
 
 # NOTES
 
@@ -319,9 +331,9 @@ on the servers I was testing, in order to choose the optimal types for the compa
 I was working for. The second version has expanded a bit over that, and is friendlier
 to use.
 
-Althought this benchmark is in general a good indicator of general CPU performance
+Although this benchmark is in general a good indicator of general CPU performance
 and can be customized to your needs, no benchmark is as good as running your own
-actual workload.
+actual workload (which can be done via the ["CUSTOM BENCHMARKS"](#custom-benchmarks) functionality).
 
 ## SCORES
 
