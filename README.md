@@ -1,6 +1,6 @@
 # NAME
 
-Benchmark::DKbench - Perl CPU Benchmark
+Benchmark::DKbench - Perl CPU Benchmark Suite
 
 # SYNOPSIS
 
@@ -237,21 +237,31 @@ exported functions that the `dkbench` script uses for reference:
 
 ## `system_identity`
 
-    my $cores = system_identity();
+    my $cores = system_identity($quiet?);
 
-Prints out software/hardware configuration and returns the number of cores detected.
+Prints out software/hardware configuration and returns the number of logical cores
+detected using [System::CPU](https://metacpan.org/pod/System%3A%3ACPU).
+
+Any argument will suppress printout and will only return the number of cores.
 
 ## `suite_run`
 
     my %stats = suite_run(\%options);
 
 Runs the benchmark suite given the `%options` and prints results. Returns a hash
-with run stats.
+with run stats that looks like this:
+
+    %stats = (
+      bench_name => {times => [ ... ], scores => [ ... ]},
+       ...
+      _total => {times => [ ... ], scores => [ ... ]},
+      _opt   => {iter => $iterations, threads => $no_threads, ...}
+    );
 
 The options of the `dkbench` script (in their long form) are accepted, except
 `help`, `setup` and `max_threads` which are exclusive to the command-line script.
 
-In addition, `%options` may contain the key `%extra_bench`, with a hashref value
+In addition, `%options` may contain the key `extra_bench`, with a hashref value
 containing custom benchmarks in the following format:
 
     extra_bench => { bench_name => [$coderef, $exp_output, $ref_time, $quick_arg, $normal_arg], ... }
@@ -268,10 +278,19 @@ For more info with an example see the ["CUSTOM BENCHMARKS"](#custom-benchmarks) 
 
 ## `calc_scalability`
 
-    calc_scalability(\%options, \%stat_single, \%stat_multi);
+    my %scal = calc_scalability(\%stat_single, \%stat_multi);
 
 Given the `%stat_single` results of a single-threaded `suite_run` and `%stat_multi`
-results of a multi-threaded run, will calculate and print the multi-thread scalability.
+results of a multi-threaded run, will calculate, print and return the multi-thread
+scalability (including averages, ranges etc for multiple iterations.
+
+The result hash return looks like this:
+
+    %scal = (
+      bench_name => $bench_avg_scalability,
+       ...
+      _total => $total_avg_scalability
+    );
 
 # CUSTOM BENCHMARKS
 
@@ -290,10 +309,8 @@ with the default benchmarks:
       my $iter = shift || 1;  # Optionally have an argument that scales the workload
       my $dist = 0;
       $dist +=
-        great_circle_distance(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) -
-        great_circle_bearing(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi)) +
-        great_circle_direction(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi))
-        for 1 .. $iter;
+        great_circle_distance(rand(pi), rand(2 * pi), rand(pi), rand(2 * pi))
+          for 1 .. $iter;
       return $dist; # Returning something is optional, but is used to Fail bench on no match
     }
 
@@ -303,8 +320,8 @@ with the default benchmarks:
           \&great_circle,      # Reference to bench function
           '3144042.81433949',  # Output for your reference Perl - determines Pass/Fail (optional)
           5.5,                 # Seconds to complete in normal mode for score = 1000 (optional)
-          400000,              # Argument to pass for --quick mode (optional)
-          2000000              # Argument to pass for normal mode (optional)
+          1000000,             # Argument to pass for --quick mode (optional)
+          5000000              # Argument to pass for normal mode (optional)
           ]},
       }
     );
@@ -316,9 +333,20 @@ to run by itself:
 
     my %stats = suite_run({
         include     => 'custom',
-        extra_bench => { custom1 => [sub {split //, 'x'x$_ for 1..10000}] }
+        extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
       }
     );
+
+If you want to do a multi-threaded run as well and then calculate scalability:
+
+    my %stats_multi = suite_run({
+        threads     => system_identity(1);
+        include     => 'custom',
+        extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
+      }
+    );
+
+    my %scal = calc_scalability(\%stats, \%stats_multi);
 
 # NOTES
 
