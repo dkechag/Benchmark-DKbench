@@ -292,6 +292,17 @@ The result hash return looks like this:
       _total => $total_avg_scalability
     );
 
+## `suite_calc`
+
+    my ($stats, $stats_multi, $scal) = suite_calc(\%suite_run_options);
+
+Convenience function that combines 3 calls, [suite\_run](https://metacpan.org/pod/suite_run) with `threads=>1`,
+[suite\_run](https://metacpan.org/pod/suite_run) with `threads=>system_identity(1)` and [calc\_scalability](https://metacpan.org/pod/calc_scalability) with
+the results of those two, returning hashrefs with the results of all three calls.
+
+For single-core systems (or when `system_identity(1)` does not return > 1)
+only `$stats` will be returned;
+
 # CUSTOM BENCHMARKS
 
 Version 2.5 introduced the ability to add custom benchmarks to be run along any
@@ -347,6 +358,14 @@ If you want to do a multi-threaded run as well and then calculate scalability:
     );
 
     my %scal = calc_scalability(\%stats, \%stats_multi);
+
+Or, with a single call via the convenience function [suite\_calc](https://metacpan.org/pod/suite_calc):
+
+    my ($stats, $stats_multi, $scal) = suite_calc({
+        include     => 'custom',
+        extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
+      }
+    );
 
 # NOTES
 
