@@ -95,26 +95,27 @@ options to control number of threads, iterations, which benchmarks to run etc:
     dkbench [options]
 
     Options:
-    --threads <i>, -j <i> : Number of benchmark threads (default is 1).
-    --multi,       -m     : Multi-threaded using all your CPU cores/threads.
-    --max_threads <i>     : Override the cpu detection to specify max cpu threads.
-    --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
-    --stdev               : Show relative standard deviation (for iter > 1).
-    --include <regex>     : Run only benchmarks that match regex.
-    --exclude <regex>     : Do not run benchmarks that match regex.
-    --time,        -t     : Report time (sec) instead of score.
-    --quick,       -q     : Quick benchmark run (implies -t).
-    --no_mce              : Do not run under MCE::Loop (implies -j 1).
-    --scale <i>,   -s <i> : Scale the bench workload by x times (incompatible with -q).
-    --skip_bio            : Skip BioPerl benchmarks.
-    --skip_prove          : Skip Moose prove benchmark.
-    --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
-    --bio_codons          : Run optional BioPerl Codons benchmark (does not scale well).
-    --sleep <i>           : Sleep for <i> secs after each benchmark.
-    --setup               : Download the Genbank data to enable the BioPerl tests.
-    --datapath <path>     : Override the path where the expected benchmark data is found.
-    --ver <num>           : Skip benchmarks added after the specified version.
-    --help         -h     : Show basic help and exit.
+    --threads <i>,  -j <i> : Number of benchmark threads (default is 1).
+    --multi,        -m     : Multi-threaded using all your CPU cores/threads.
+    --max_threads <i>      : Override the cpu detection to specify max cpu threads.
+    --iter <i>,     -i <i> : Number of suite iterations (with min/max/avg at the end).
+    --stdev                : Show relative standard deviation (for iter > 1).
+    --include <regex>      : Run only benchmarks that match regex.
+    --exclude <regex>      : Do not run benchmarks that match regex.
+    --time,         -t     : Report time (sec) instead of score.
+    --quick,        -q     : Quick benchmark run (implies -t).
+    --no_mce               : Do not run under MCE::Loop (implies -j 1).
+    --scale <i>,    -s <i> : Scale the bench workload by x times (incompatible with -q).
+    --skip_bio             : Skip BioPerl benchmarks.
+    --skip_prove           : Skip Moose prove benchmark.
+    --time_piece           : Run optional Time::Piece benchmark (see benchmark details).
+    --bio_codons           : Run optional BioPerl Codons benchmark (does not scale well).
+    --sleep <i>            : Sleep for <i> secs after each benchmark.
+    --duration <i>, -d <i> : Minimum duration in seconds for suite run.
+    --setup                : Download the Genbank data to enable the BioPerl tests.
+    --datapath <path>      : Override the path where the expected benchmark data is found.
+    --ver <num>            : Skip benchmarks added after the specified version.
+    --help          -h     : Show basic help and exit.
 
 The default run (no options) will run all the benchmarks both single-threaded and
 multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
@@ -122,7 +123,7 @@ multi vs single threaded scalability.
 
 The scores are calibrated such that a reference CPU (Intel Xeon Platinum 8481C -
 Sapphire Rapids) would achieve a score of 1000 in a single-core benchmark run using
-the default software configuration (Linux/Perl 5.36.0 built with multiplicity and
+the default software configuration (Linux/Perl 5.36+ built with multiplicity and
 threads, with reference CPAN module versions). Perl built without thread support and
 multi(plicity) will be a bit faster (usually in the order of ~3-4%), while older Perl
 versions will most likely be slower. Different CPAN module versions will also impact
