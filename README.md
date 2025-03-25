@@ -26,7 +26,22 @@ real-world scenarios. It runs single and multi-threaded (able to scale to hundre
 of CPUs) and can be fully customized to run the benchmarks that better suit your own
 scenario - even allowing you to add your own custom benchmarks.
 
-# INSTALLATION
+# RUNNING WITH DOCKER
+
+For convenience, there is a ready-to-run Debian-based [Docker image](https://github.com/dkechag/dkbench-docker)
+available.
+
+With Docker installed, you can run:
+
+    docker run -it --rm dkechag/dkbench
+
+which drops you into a bash shell inside the container. There, the `dkbench`
+command is available to run the suite.
+
+Docker does add a small overhead and variance to the test suite, so be aware there
+is still an advantage in manual installation.
+
+# MANUAL INSTALLATION
 
 See the ["setup\_dkbench"](#setup_dkbench) script below for more on the installation of a couple
 of optional benchmarks and standardizing your benchmarking environment, otherwise
