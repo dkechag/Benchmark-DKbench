@@ -38,7 +38,7 @@ use Text::Levenshtein::XS;
 
 my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.10';
+our $VERSION = '3.00';
 our @EXPORT  = qw(system_identity suite_run calc_scalability suite_calc);
 our $datadir = dist_dir("Benchmark-DKbench");
 
