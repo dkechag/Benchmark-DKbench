@@ -332,12 +332,12 @@ This is now imported directly from L<Benchmark::MCE>, see POD for that module.
 
 =head2 C<suite_run>
 
-This is now imported directly from L<Benchmark::MCE>, with the addition of C<extra_bench>,
+This is now imported from L<Benchmark::MCE>, with the addition of C<extra_bench>,
 see POD for that module and L<CUSTOM BENCHMARKS> below.
 
 =head2 C<calc_scalability>
 
-This is now imported directly from L<Benchmark::MCE>, see POD for that module.
+This is now an alias to L<Benchmark::MCE::calc_scalability>, see POD for that module.
 
 =head2 C<suite_calc>
 
@@ -458,15 +458,16 @@ L<https://github.com/dkechag/Benchmark-DKbench>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2021-2025 by Dimitrios Kechagias.
+This software is copyright (c) 2021-2026 by Dimitrios Kechagias.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-*system_identity   = \&Benchmark::MCE::system_identity;
 *calc_scalability  = \&Benchmark::MCE::calc_scalability;
+
+sub system_identity { Benchmark::MCE::system_identity(@_) };
 
 sub benchmark_list {
     my $extra_bench = shift || {};
