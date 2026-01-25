@@ -332,35 +332,8 @@ This is now imported directly from L<Benchmark::MCE>, see POD for that module.
 
 =head2 C<suite_run>
 
- my %stats = suite_run(\%options);
-
-Runs the benchmark suite given the C<%options> and prints results. Returns a hash
-with run stats that looks like this:
-
- %stats = (
-   bench_name => {times => [ ... ], scores => [ ... ]},
-    ...
-   _total => {times => [ ... ], scores => [ ... ]},
-   _opt   => {iter => $iterations, threads => $no_threads, ...}
- );
-
-The options of the C<dkbench> script (in their long form) are accepted, except
-C<help>, C<setup> and C<max_threads> which are exclusive to the command-line script.
-
-In addition, C<%options> may contain the key C<extra_bench>, with a hashref value
-containing custom benchmarks in the following format:
-
- extra_bench => { bench_name => [$coderef, $exp_output, $ref_time, $quick_arg, $normal_arg], ... }
-
-Where C<bench_name> is a unique name for each benchmark and the arrayref assigned
-to it contains: A reference to the benchmarking code, the expected output (string)
-for the test to be considered a pass, the reference time in seconds for a score of
-1000, an argument (workload scaling) to pass to the function for the C<quick> bench
-run and an argument to pass for the normal run. If the second argument is undef,
-a "Pass" is always recorded, if the third argument is not defined and non-zero,
-C<time> will be implied.
-
-For more info with an example see the L<CUSTOM BENCHMARKS> section.
+This is now imported directly from L<Benchmark::MCE>, with the addition of C<extra_bench>,
+see POD for that module and L<CUSTOM BENCHMARKS> below.
 
 =head2 C<calc_scalability>
 
@@ -368,14 +341,8 @@ This is now imported directly from L<Benchmark::MCE>, see POD for that module.
 
 =head2 C<suite_calc>
 
- my ($stats, $stats_multi, $scal) = suite_calc(\%suite_run_options);
-
-Convenience function that combines 3 calls, L<suite_run> with C<threads=E<gt>1>,
-L<suite_run> with C<threads=E<gt>system_identity(1)> and L<calc_scalability> with
-the results of those two, returning hashrefs with the results of all three calls.
-
-For single-core systems (or when C<system_identity(1)> does not return E<gt> 1)
-only C<$stats> will be returned;
+This is now imported directly from L<Benchmark::MCE>, with the addition of C<extra_bench>,
+see POD for that module and L<CUSTOM BENCHMARKS> below.
 
 =head1 CUSTOM BENCHMARKS
 
@@ -555,8 +522,8 @@ sub suite_calc {
 sub _init_opt {
     my $opt = shift;
     $opt->{filter} = \&_dkbench_filter;
-    $opt->{bench}  = benchmark_list($opt->{extra_bench});
     $datadir       = $opt->{datapath} if $opt->{datapath};
+    $opt->{bench}  //= benchmark_list($opt->{extra_bench});
     return $opt;
 }
 

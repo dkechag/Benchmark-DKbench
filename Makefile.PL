@@ -6,12 +6,6 @@ use File::ShareDir::Install;
 
 install_share dist => 'data';
 
-# Optional except for cpancover, cpantesters etc.
-my $extra_test =
-  ( $ENV{EXTENDED_TESTING} || $ENV{AUTOMATED_TESTING} )
-  ? 'requires'
-  : 'recommends';
-
 my %WriteMakefileArgs = (
     NAME               => 'Benchmark::DKbench',
     AUTHOR             => q{Dimitrios Kechagias <dkechag@cpan.org>},
@@ -60,13 +54,6 @@ my %WriteMakefileArgs = (
     },
     META_MERGE        => {
         "meta-spec" => { version => 2 },
-        prereqs => {
-            test => {
-                $extra_test => {
-                    'Test::MockFile' => '0',
-                }
-            },
-        },
         resources => {
             repository => {
                 type => 'git',

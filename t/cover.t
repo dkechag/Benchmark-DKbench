@@ -1,4 +1,5 @@
 use Test2::Tools::Exception qw/dies lives/;
+use Test2::Mock;
 use Test2::V0;
 use Benchmark::DKbench;
 use Capture::Tiny 'capture';
@@ -131,5 +132,12 @@ $Benchmark::DKbench::datadir = '';
 ok(dies {Benchmark::DKbench::_bench_imager(1)}, "No image file found");
 
 is(Benchmark::DKbench::benchmark_list(), Benchmark::DKbench::benchmark_list({}), 'benchmark_list');
+
+my $mock = Test2::Mock->new(
+    class => 'System::CPU',
+    override => [ get_cpu => sub {} ]
+);
+my @out = suite_calc({include => 'Astro', quick => 1});
+is(scalar @out, 1, 'Single Core result only');
 
 done_testing();
