@@ -522,6 +522,14 @@ sub suite_calc {
 
 sub _init_opt {
     my $opt = shift;
+
+    $opt->{skip_bio} ||= !(
+        eval {
+            require Bio::SeqIO;
+            require Bio::Tools::SeqStats;
+            1;
+        }
+    );
     $opt->{filter} = \&_dkbench_filter;
     $datadir       = $opt->{datapath} if $opt->{datapath};
     $opt->{bench}  //= benchmark_list($opt->{extra_bench});
