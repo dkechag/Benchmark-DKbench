@@ -199,7 +199,7 @@ The suite will report a Pass/Fail per benchmark. A failure may be caused if you 
 different CPAN module version installed - this is normal, and you will be warned.
 
 L<MCE::Loop> is used to run on the desired number of parallel threads, with minimal
-overhead., There is an option to disable it, which forces a single-thread run.
+overhead. There is an option to disable it, which forces a single-thread run.
 
 =head2 C<setup_dkbench>
 
@@ -264,7 +264,7 @@ using L<Crypt::JWT>.
 it insert/select statements using L<SQL::Inserter> and L<SQL::Abstract::Classic>.
 The latter is quite slow at creating the statements, but it is widely used.
 
-=item * C<Digest> : Creates MD5, SH1 and SHA-512 digests of a large string.
+=item * C<Digest> : Creates MD5, SHA-1 and SHA-512 digests of a large string.
 
 =item * C<Encode> : Encodes/decodes large strings from/to UTF-8/16, cp-1252.
 
@@ -285,7 +285,7 @@ matrices.
 =item * C<Moose> : Creates L<Moose> objects.
 
 =item * C<Moose prove> : Runs 110 tests from the Moose 2.2201 test suite. The least
-CPU-intensive test (which is why there is the option C<--no_prove> to disable it),
+CPU-intensive test (which is why there is the option C<--skip_prove> to disable it),
 most of the time will be spent loading the interpreter and the Moose module for each
 test, which is behaviour representative of how a Perl test suite runs by default.
 
@@ -392,7 +392,7 @@ to run by itself:
 If you want to do a multi-threaded run as well and then calculate scalability:
 
   my %stats_multi = suite_run({
-      threads     => system_identity(1);
+      threads     => system_identity(1),
       include     => 'custom',
       extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
     }
@@ -499,7 +499,7 @@ sub benchmark_list {
 
 sub _dkbench_filter {
     my ($opt, $bench, $benchmark) = @_;
-    return 0 if $opt->{skip_bio}    && $bench =~ /Monomers/;
+    return 0 if $opt->{skip_bio}    && $bench =~ /BioPerl/;
     return 0 if $opt->{skip_prove}  && $bench =~ /prove/;
     return 0 if !$opt->{bio_codons} && $bench =~ /Codons/;
     return 0 if !$opt->{time_piece} && $bench =~ /Time::Piece/;

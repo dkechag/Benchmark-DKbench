@@ -158,7 +158,7 @@ The suite will report a Pass/Fail per benchmark. A failure may be caused if you 
 different CPAN module version installed - this is normal, and you will be warned.
 
 [MCE::Loop](https://metacpan.org/pod/MCE%3A%3ALoop) is used to run on the desired number of parallel threads, with minimal
-overhead., There is an option to disable it, which forces a single-thread run.
+overhead. There is an option to disable it, which forces a single-thread run.
 
 ## `setup_dkbench`
 
@@ -214,7 +214,7 @@ using [Crypt::JWT](https://metacpan.org/pod/Crypt%3A%3AJWT).
 - `DBI/SQL` : Creates a mock [DBI](https://metacpan.org/pod/DBI) connection (using [DBD::Mock](https://metacpan.org/pod/DBD%3A%3AMock)) and passes
 it insert/select statements using [SQL::Inserter](https://metacpan.org/pod/SQL%3A%3AInserter) and [SQL::Abstract::Classic](https://metacpan.org/pod/SQL%3A%3AAbstract%3A%3AClassic).
 The latter is quite slow at creating the statements, but it is widely used.
-- `Digest` : Creates MD5, SH1 and SHA-512 digests of a large string.
+- `Digest` : Creates MD5, SHA-1 and SHA-512 digests of a large string.
 - `Encode` : Encodes/decodes large strings from/to UTF-8/16, cp-1252.
 - `HTML::FormatText` : Converts HTML to text for 2 sample wiki pages using
 [HTML::FormatText](https://metacpan.org/pod/HTML%3A%3AFormatText).
@@ -227,7 +227,7 @@ The latter is quite slow at creating the statements, but it is widely used.
 matrices.
 - `Moose` : Creates [Moose](https://metacpan.org/pod/Moose) objects.
 - `Moose prove` : Runs 110 tests from the Moose 2.2201 test suite. The least
-CPU-intensive test (which is why there is the option `--no_prove` to disable it),
+CPU-intensive test (which is why there is the option `--skip_prove` to disable it),
 most of the time will be spent loading the interpreter and the Moose module for each
 test, which is behaviour representative of how a Perl test suite runs by default.
 - `Primes` : Calculates all primes up to 7.5 million. Small number with
@@ -327,7 +327,7 @@ to run by itself:
 If you want to do a multi-threaded run as well and then calculate scalability:
 
     my %stats_multi = suite_run({
-        threads     => system_identity(1);
+        threads     => system_identity(1),
         include     => 'custom',
         extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
       }

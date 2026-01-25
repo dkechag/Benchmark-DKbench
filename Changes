@@ -1,6 +1,6 @@
 Revision history for Benchmark-DKbench
 
-3.01    2025-
+3.01    2026-01-25
         - Refactored harness to external module Benchmark::MCE.
 
 3.00    2025-03-25
