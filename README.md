@@ -158,7 +158,7 @@ The suite will report a Pass/Fail per benchmark. A failure may be caused if you 
 different CPAN module version installed - this is normal, and you will be warned.
 
 [MCE::Loop](https://metacpan.org/pod/MCE%3A%3ALoop) is used to run on the desired number of parallel threads, with minimal
-overhead., There is an option to disable it, which forces a single-thread run.
+overhead. There is an option to disable it, which forces a single-thread run.
 
 ## `setup_dkbench`
 
@@ -214,7 +214,7 @@ using [Crypt::JWT](https://metacpan.org/pod/Crypt%3A%3AJWT).
 - `DBI/SQL` : Creates a mock [DBI](https://metacpan.org/pod/DBI) connection (using [DBD::Mock](https://metacpan.org/pod/DBD%3A%3AMock)) and passes
 it insert/select statements using [SQL::Inserter](https://metacpan.org/pod/SQL%3A%3AInserter) and [SQL::Abstract::Classic](https://metacpan.org/pod/SQL%3A%3AAbstract%3A%3AClassic).
 The latter is quite slow at creating the statements, but it is widely used.
-- `Digest` : Creates MD5, SH1 and SHA-512 digests of a large string.
+- `Digest` : Creates MD5, SHA-1 and SHA-512 digests of a large string.
 - `Encode` : Encodes/decodes large strings from/to UTF-8/16, cp-1252.
 - `HTML::FormatText` : Converts HTML to text for 2 sample wiki pages using
 [HTML::FormatText](https://metacpan.org/pod/HTML%3A%3AFormatText).
@@ -227,7 +227,7 @@ The latter is quite slow at creating the statements, but it is widely used.
 matrices.
 - `Moose` : Creates [Moose](https://metacpan.org/pod/Moose) objects.
 - `Moose prove` : Runs 110 tests from the Moose 2.2201 test suite. The least
-CPU-intensive test (which is why there is the option `--no_prove` to disable it),
+CPU-intensive test (which is why there is the option `--skip_prove` to disable it),
 most of the time will be spent loading the interpreter and the Moose module for each
 test, which is behaviour representative of how a Perl test suite runs by default.
 - `Primes` : Calculates all primes up to 7.5 million. Small number with
@@ -246,78 +246,38 @@ if you are trying to compare CPUs on different OS platforms. It can be enabled w
 the `--time_piece` option. For MacOS specifically, it can only be enabled if `--no_mce`
 is specified, as it runs extremely slow when forked.
 
+## `benchmark_list`
+
+    my $benchmarks = Benchmark::DKbench::benchmark_list($extra_benchmarks_hashref);
+
+Returns a hashref with all the suite's benchmarks listed above (optionally adding
+the ones you pass as an argument) in the format `Benchmark::MCE::suite_run` expects
+as the `bench` parameter.
+
 # EXPORTED FUNCTIONS
 
-You will normally not use the Benchmark::DKbench module itself, but here are the
-exported functions that the `dkbench` script uses for reference:
+The exported functions are the same as [Benchmark::MCE](https://metacpan.org/pod/Benchmark%3A%3AMCE) and are used by the `dkbench`
+script. You will normally use these functions from [Benchmark::MCE](https://metacpan.org/pod/Benchmark%3A%3AMCE) if you want to
+build your own benchmark suite, except if you want to extend DKbench by adding your
+own modules, and/or replacing the `dkbench` script:
 
 ## `system_identity`
 
-    my $cores = system_identity($quiet?);
-
-Prints out software/hardware configuration and returns the number of logical cores
-detected using [System::CPU](https://metacpan.org/pod/System%3A%3ACPU).
-
-Any argument will suppress printout and will only return the number of cores.
+This is now imported directly from [Benchmark::MCE](https://metacpan.org/pod/Benchmark%3A%3AMCE), see POD for that module.
 
 ## `suite_run`
 
-    my %stats = suite_run(\%options);
-
-Runs the benchmark suite given the `%options` and prints results. Returns a hash
-with run stats that looks like this:
-
-    %stats = (
-      bench_name => {times => [ ... ], scores => [ ... ]},
-       ...
-      _total => {times => [ ... ], scores => [ ... ]},
-      _opt   => {iter => $iterations, threads => $no_threads, ...}
-    );
-
-The options of the `dkbench` script (in their long form) are accepted, except
-`help`, `setup` and `max_threads` which are exclusive to the command-line script.
-
-In addition, `%options` may contain the key `extra_bench`, with a hashref value
-containing custom benchmarks in the following format:
-
-    extra_bench => { bench_name => [$coderef, $exp_output, $ref_time, $quick_arg, $normal_arg], ... }
-
-Where `bench_name` is a unique name for each benchmark and the arrayref assigned
-to it contains: A reference to the benchmarking code, the expected output (string)
-for the test to be considered a pass, the reference time in seconds for a score of
-1000, an argument (workload scaling) to pass to the function for the `quick` bench
-run and an argument to pass for the normal run. If the second argument is undef,
-a "Pass" is always recorded, if the third argument is not defined and non-zero,
-`time` will be implied.
-
-For more info with an example see the ["CUSTOM BENCHMARKS"](#custom-benchmarks) section.
+This is now imported from [Benchmark::MCE](https://metacpan.org/pod/Benchmark%3A%3AMCE), with the addition of `extra_bench`,
+see POD for that module and ["CUSTOM BENCHMARKS"](#custom-benchmarks) below.
 
 ## `calc_scalability`
 
-    my %scal = calc_scalability(\%stat_single, \%stat_multi);
-
-Given the `%stat_single` results of a single-threaded `suite_run` and `%stat_multi`
-results of a multi-threaded run, will calculate, print and return the multi-thread
-scalability (including averages, ranges etc for multiple iterations.
-
-The result hash return looks like this:
-
-    %scal = (
-      bench_name => $bench_avg_scalability,
-       ...
-      _total => $total_avg_scalability
-    );
+This is now an alias to [Benchmark::MCE::calc\_scalability](https://metacpan.org/pod/Benchmark%3A%3AMCE%3A%3Acalc_scalability), see POD for that module.
 
 ## `suite_calc`
 
-    my ($stats, $stats_multi, $scal) = suite_calc(\%suite_run_options);
-
-Convenience function that combines 3 calls, [suite\_run](https://metacpan.org/pod/suite_run) with `threads=>1`,
-[suite\_run](https://metacpan.org/pod/suite_run) with `threads=>system_identity(1)` and [calc\_scalability](https://metacpan.org/pod/calc_scalability) with
-the results of those two, returning hashrefs with the results of all three calls.
-
-For single-core systems (or when `system_identity(1)` does not return > 1)
-only `$stats` will be returned;
+This is now imported directly from [Benchmark::MCE](https://metacpan.org/pod/Benchmark%3A%3AMCE), with the addition of `extra_bench`,
+see POD for that module and ["CUSTOM BENCHMARKS"](#custom-benchmarks) below.
 
 # CUSTOM BENCHMARKS
 
@@ -367,7 +327,7 @@ to run by itself:
 If you want to do a multi-threaded run as well and then calculate scalability:
 
     my %stats_multi = suite_run({
-        threads     => system_identity(1);
+        threads     => system_identity(1),
         include     => 'custom',
         extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
       }
@@ -382,6 +342,9 @@ Or, with a single call via the convenience function [suite\_calc](https://metacp
         extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
       }
     );
+
+For creating your own benchmark suite from scratch, instead of extending the existing
+ones, please see [Benchmark::MCE](https://metacpan.org/pod/Benchmark%3A%3AMCE) instead which is only the harness without benchmarks.
 
 # NOTES
 
@@ -430,7 +393,7 @@ I will be notified, and then you'll automatically be notified of progress on you
 
 # LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2021-2024 by Dimitrios Kechagias.
+This software is copyright (c) 2021-2026 by Dimitrios Kechagias.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
