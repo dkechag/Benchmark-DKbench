@@ -75,7 +75,7 @@ sub has_genbank {
 sub fetch_genbank {
     my $datadir = shift || datadir();
     return if -f catfile($datadir, "gbbct5.seq");
-    print "Fetching gbbct5.seq of Genbank release 213...\n";
+    print "Fetching gbbct5.seq of GenBank release 213...\n";
     mkpath $datadir unless -e $datadir;
 
     my $ff = File::Fetch->new(uri => 'http://ecuadors.net/files/gbbct5.seq.gz');

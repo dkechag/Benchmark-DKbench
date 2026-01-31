@@ -19,7 +19,7 @@ See POD on the main module for info:
  Options:
  --threads <i>,  -j <i> : Number of benchmark threads (default is 1).
  --multi,        -m     : Multi-threaded using all your CPU cores/threads.
- --max_threads <i>      : Override the cpu detection to specify max cpu threads.
+ --max_threads <i>      : Override the CPU detection to specify max CPU threads.
  --iter <i>,     -i <i> : Number of suite iterations (with min/max/avg at the end).
  --stdev                : Show relative standard deviation (for iter > 1).
  --include <regex>      : Run only benchmarks that match regex.
@@ -34,13 +34,13 @@ See POD on the main module for info:
  --bio_codons           : Run optional BioPerl Codons benchmark (does not scale well).
  --sleep <i>            : Sleep for <i> secs after each benchmark.
  --duration <i>, -d <i> : Minimum duration in seconds for suite run.
- --setup                : Download the Genbank data to enable the BioPerl tests.
+ --setup                : Download the GenBank data to enable the BioPerl tests.
  --datapath <path>      : Override the path where the expected benchmark data is found.
  --ver <num>            : Skip benchmarks added after the specified version.
  --help          -h     : Show basic help and exit.
 
 The default run (no options) will run all the benchmarks both single-threaded and
-multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
+multi-threaded (using all detected CPU cores/hyper-threads) and show you scores and
 multi vs single threaded scalability.
 
 =cut
@@ -145,6 +145,6 @@ sub check_kit {
 
     if ($opt{time_piece} && $^O =~ /darwin/ && !$opt{no_mce}) {
         $opt{time_piece} = 0;
-        warn "!! Running localtime forked on MacOS is extremely slow, disabling Time::Piece. You may run it with --no_mce.\n"
+        warn "!! Running localtime forked on macOS is extremely slow, disabling Time::Piece. You may run it with --no_mce.\n"
     }
 }

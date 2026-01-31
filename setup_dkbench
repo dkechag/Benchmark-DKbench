@@ -15,13 +15,13 @@ Refer to the distribution POD for more information on the DKbench suite:
 =head1 SYNOPSIS
 
 Simple setup script to check/get the reference versions of CPAN modules and download
-the Genbank data file required for the BioPerl benchmarks of the DKbench suite.
+the GenBank data file required for the BioPerl benchmarks of the DKbench suite.
 
  setup_dkbench [options]
 
  Options:
  --sudo   : Will use sudo for cpanm calls.
- --force  : Will install reference CPAN module versions and re-download the genbank data.
+ --force  : Will install reference CPAN module versions and re-download the GenBank data.
  --test   : Will run the test suites for the CPAN module (default behavior is to skip).
  --data=s : Data dir path to copy files from. Should not need if you installed DKbench.
  --help   : Print this help text and exit.
@@ -32,7 +32,7 @@ This might be perfectly fine for your purposes - in fact it might be intended if
 you are benchmarking to compare different software instead of hardware.
 
 This installer assumes you have at least cpanm (L<App::cpanminus>) already installed.
-If not, on must systems you can do that with:
+If not, on most systems you can do that with:
 
  # System-wide with sudo:
  curl -L https://cpanmin.us | perl - --sudo App::cpanminus

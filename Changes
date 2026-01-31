@@ -1,5 +1,9 @@
 Revision history for Benchmark-DKbench
 
+3.02    2026-01-31
+        - Updated for newer Benchmark::MCE.
+        - POD fixes.
+
 3.01    2026-01-25
         - Refactored harness to external module Benchmark::MCE (DKbench now uses the external harness).
 
@@ -7,7 +11,7 @@ Revision history for Benchmark-DKbench
         - Docker image available.
         - Fix invalid key error with newer CryptX.
         - Compatible with older versions of DBI.
-        - Supress prove error output.
+        - Suppress prove error output.
         - Update package versions, setup_dkbench --force skips identical ver.
 
 2.9     2024-07-29
@@ -37,7 +41,7 @@ Revision history for Benchmark-DKbench
 2.3     2023-09-25
         - Show Perl threads/multi config.
         - Minimum module version for passing benchmarks.
-        - Improvements for Strawberry Perl (prefer the much faster WSL though - or at least cygwin).
+        - Improvements for Strawberry Perl (prefer the much faster WSL though - or at least Cygwin).
 
 2.2     2023-09-21
         - Time::Piece test is optional for all platforms.

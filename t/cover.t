@@ -10,8 +10,8 @@ like(
     dies {
         suite_run({iter => 1, exclude => 'Moose', include => 'prove', sleep => 1})
     },
-    qr/No tests/,
-    'No tests to run'
+    qr/No .* to run/,
+    'No benchmarks to run'
 );
 
 like(

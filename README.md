@@ -11,7 +11,7 @@ Benchmark::DKbench - Perl CPU Benchmark Suite
     # A dual-thread "quick" run (with times instead of scores)
     dkbench -j 2 -q
 
-    # If BioPerl is installed, enable the BioPerl benchmarks by downloading Genbank data
+    # If BioPerl is installed, enable the BioPerl benchmarks by downloading GenBank data
     dkbench --setup
 
     # Force install the reference versions of all CPAN modules
@@ -75,10 +75,10 @@ the benchmark suite.
 ## Strawberry Perl
 
 If you are on Windows, you should be using the Windows Subsystem for Linux (WSL)
-for running Perl or, if you can't (e.g. old Windows versions), cygwin instead.
+for running Perl or, if you can't (e.g. old Windows versions), Cygwin instead.
 The suite should still work on Strawberry Perl, as long as you don't try to run
 tests when installing (some dependencies will not pass them). The simplest way is
-with [App::cpanminus](https://metacpan.org/pod/App%3A%3Acpanminus) (most Strawberry Perl verions have it installed):
+with [App::cpanminus](https://metacpan.org/pod/App%3A%3Acpanminus) (most Strawberry Perl versions have it installed):
 
     cpanm -n Benchmark::DKbench
 
@@ -93,7 +93,7 @@ runs the suite (and `setup_dkbench.bat` can assist with module versions, optiona
 benchmarks etc.).
 
 Be aware that Strawberry Perl is slower, on my test system I get almost 50% slower
-performance than WSL and 30% slower than cygwin.
+performance than WSL and 30% slower than Cygwin.
 
 # SCRIPTS
 
@@ -112,7 +112,7 @@ options to control number of threads, iterations, which benchmarks to run etc:
     Options:
     --threads <i>,  -j <i> : Number of benchmark threads (default is 1).
     --multi,        -m     : Multi-threaded using all your CPU cores/threads.
-    --max_threads <i>      : Override the cpu detection to specify max cpu threads.
+    --max_threads <i>      : Override the CPU detection to specify max CPU threads.
     --iter <i>,     -i <i> : Number of suite iterations (with min/max/avg at the end).
     --stdev                : Show relative standard deviation (for iter > 1).
     --include <regex>      : Run only benchmarks that match regex.
@@ -127,13 +127,13 @@ options to control number of threads, iterations, which benchmarks to run etc:
     --bio_codons           : Run optional BioPerl Codons benchmark (does not scale well).
     --sleep <i>            : Sleep for <i> secs after each benchmark.
     --duration <i>, -d <i> : Minimum duration in seconds for suite run.
-    --setup                : Download the Genbank data to enable the BioPerl tests.
+    --setup                : Download the GenBank data to enable the BioPerl tests.
     --datapath <path>      : Override the path where the expected benchmark data is found.
     --ver <num>            : Skip benchmarks added after the specified version.
     --help          -h     : Show basic help and exit.
 
 The default run (no options) will run all the benchmarks both single-threaded and
-multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
+multi-threaded (using all detected CPU cores/hyper-threads) and show you scores and
 multi vs single threaded scalability.
 
 The scores are calibrated such that a reference CPU (Intel Xeon Platinum 8481C -
@@ -163,7 +163,7 @@ overhead. There is an option to disable it, which forces a single-thread run.
 ## `setup_dkbench`
 
 Simple installer to check/get the reference versions of CPAN modules and download
-the Genbank data file required for the BioPerl benchmarks of the DKbench suite.
+the GenBank data file required for the BioPerl benchmarks of the DKbench suite.
 
 It assumes that you have some software already installed (see ["INSTALLATION"](#installation) above),
 try `setup_dkbench --help` will give you more details.
@@ -189,7 +189,7 @@ between systems and also for the benchmark Pass/Fail results to be reliable.
 # BENCHMARKS
 
 The suite consists of 21 benchmarks, 19 will run by default. However, the
-`BioPerl Monomers` requires the optional [BioPerl](https://metacpan.org/pod/BioPerl) to be installed and Genbank
+`BioPerl Monomers` requires the optional [BioPerl](https://metacpan.org/pod/BioPerl) to be installed and GenBank
 data to be downloaded (`dkbench --setup` can do the latter), so you will only
 see 18 benchmarks running just after a standard install. Because the overall score
 is an average, it is generally unaffected by adding or skipping a benchmark or two.
@@ -233,7 +233,7 @@ test, which is behaviour representative of how a Perl test suite runs by default
 - `Primes` : Calculates all primes up to 7.5 million. Small number with
 repeat was chosen to keep low memory (this is a pure Perl function no Math libraries).
 - `Regex/Subst` : Concatenates 3 wiki pages into a byte string then matches
-3 typical regexes (for names, emails, URIs), replaces html tags with their contents
+3 typical regexes (for names, emails, URIs), replaces HTML tags with their contents
 (starting with the innermost) and does calls subst a few times.
 - `Regex/Subst utf8` : Exactly the same as `Regex/Subst`, but reads into
 a utf8 string. Perl version can make a big difference, as Unicode behaviour has
@@ -243,7 +243,7 @@ to 2500) are calculated using [Text::Levenshtein::XS](https://metacpan.org/pod/T
 - `Time::Piece` : Creates and manipulates/converts Time::Piece objects. It
 is disabled by default because it uses the OS time libraries, so it might skew results
 if you are trying to compare CPUs on different OS platforms. It can be enabled with
-the `--time_piece` option. For MacOS specifically, it can only be enabled if `--no_mce`
+the `--time_piece` option. For macOS specifically, it can only be enabled if `--no_mce`
 is specified, as it runs extremely slow when forked.
 
 ## `benchmark_list`
@@ -367,10 +367,10 @@ Some sample DKbench score results from various systems for comparison (all on
 reference setup with Perl 5.36.0 thread-multi):
 
     CPU                                     Cores/HT   Single   Multi   Scalability
-    Intel i7-4750HQ @ 2.0 (MacOS)                4/8     612     2332      46.9%
+    Intel i7-4750HQ @ 2.0 (macOS)                4/8     612     2332      46.9%
     AMD Ryzen 5 PRO 4650U @ 2.1 (WSL)           6/12     905     4444      40.6%
-    Apple M1 Pro @ 3.2 (MacOS)                 10/10    1283    10026      78.8%
-    Apple M2 Pro @ 3.5 (MacOS)                 12/12    1415    12394      73.1%
+    Apple M1 Pro @ 3.2 (macOS)                 10/10    1283    10026      78.8%
+    Apple M2 Pro @ 3.5 (macOS)                 12/12    1415    12394      73.1%
     Ampere Altra @ 3.0 (Linux)                 48/48     708    32718      97.7%
     Intel Xeon Platinum 8481C @ 2.7 (Linux)   88/176    1000    86055      48.9%
     AMD EPYC Milan 7B13 @ 2.45 (Linux)       112/224     956   104536      49.3%
